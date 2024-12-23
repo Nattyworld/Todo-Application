@@ -52,18 +52,8 @@ app.get('/signup', (req, res) => {
     res.render('signup');
 });
 
-mongoose
-    .connect(process.env.MONGO_URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    })
-    .then(() => {
-        console.log('Connected to MongoDB');
-        app.listen(PORT, () => {
-            console.log(`App is running on http://localhost:${PORT}`);
-        });
-    })
-    .catch((err) => {
-        console.error('Error connecting with Database', err);
-        process.exit(1); 
-    });
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => app.listen(PORT, () => {
+    console.log(`App is running on http://localhost:${PORT}`);
+  }))
+  .catch(err => console.error('Database connection error:', err));
