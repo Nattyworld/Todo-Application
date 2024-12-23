@@ -1,0 +1,20 @@
+<h1>My Tasks</h1>
+<form action="/Views/tasks.ejs" method="POST">
+  <input type="text" name="description" placeholder="New Task" required />
+  <button type="submit">Add Task</button>
+</form>
+<ul>
+  <% tasks.forEach(task => { %>
+    <li>
+      <%= task.description %> - <%= task.state %>
+      <form action="/tasks/<%= task._id %>/state" method="POST">
+        <select name="state">
+          <option value="pending" <%= task.state === 'pending' ? 'selected' : '' %>>Pending</option>
+          <option value="completed" <%= task.state === 'completed' ? 'selected' : '' %>>Completed</option>
+          <option value="deleted" <%= task.state === 'deleted' ? 'selected' : '' %>>Deleted</option>
+        </select>
+        <button type="submit">Update</button>
+      </form>
+    </li>
+  <% }) %>
+</ul>
