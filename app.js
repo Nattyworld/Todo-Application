@@ -17,34 +17,53 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
-
 app.use(morgan('dev'));
 
-app.use(session({
-    secret: process.env.SESSION_SECRET || 'mysecret',
-    resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
-}));
+if (!process.env.MONGO_URI) {
+    console.error('Error: MONGO_URI is not set in the environment variables.');
+    process.exit(1); 
+}
+
+if (!process.env.SESSION_SECRET) {
+    console.error('Error: SESSION_SECRET is not set in the environment variables.');
+    process.exit(1); 
+}
+
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET,
+        resave: false,
+        saveUninitialized: false,
+        store: MongoStore.create({
+            mongoUrl: process.env.MONGO_URI,
+        }),
+    })
+);
+
 
 app.use('/auth', authRoutes);
 app.use('/tasks', taskRoutes);
 
 app.get('/', (req, res) => {
-    res.json({ message: 'Welcome to the homepage' });
+    res.render('index');
 });
 
 app.get('/signup', (req, res) => {
     res.render('signup');
 });
 
-app.get('/', (req, res) => {
-    res.render('index');
-});
-
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => app.listen(PORT, () => {
-        console.log(`App is running on http://localhost:${PORT}`);
-    }))
-    .catch(err => console.error('Database connection error:', err));
-
+mongoose
+    .connect(process.env.MONGO_URI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    })
+    .then(() => {
+        console.log('Connected to MongoDB');
+        app.listen(PORT, () => {
+            console.log(`App is running on http://localhost:${PORT}`);
+        });
+    })
+    .catch((err) => {
+        console.error('Error connecting with Database', err);
+        process.exit(1); 
+    });
