@@ -19,15 +19,22 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
 app.use(morgan('dev'));
 
-if (!process.env.MONGO_URI) {
-    console.error('Error: MONGO_URI is not set in the environment variables.');
-    process.exit(1); 
+if (!process.env.MONGO_URI || !process.env.SESSION_SECRET) {
+    console.error('Error: Missing required environment variables.');
+    process.exit(1);
 }
 
-if (!process.env.SESSION_SECRET) {
-    console.error('Error: SESSION_SECRET is not set in the environment variables.');
-    process.exit(1); 
-}
+mongoose.connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+})
+    .then(() => {
+        console.log('MongoDB connected successfully!');
+    })
+    .catch(err => {
+        console.error('Error connecting to MongoDB:', err.message);
+        process.exit(1);
+    });
 
 app.use(
     session({
@@ -40,7 +47,6 @@ app.use(
     })
 );
 
-
 app.use('/auth', authRoutes);
 app.use('/tasks', taskRoutes);
 
@@ -52,8 +58,6 @@ app.get('/signup', (req, res) => {
     res.render('signup');
 });
 
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => app.listen(PORT, () => {
-    console.log(`App is running on http://localhost:${PORT}`);
-  }))
-  .catch(err => console.error('Database connection error:', err));
+app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+});
