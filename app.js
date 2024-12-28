@@ -13,7 +13,7 @@ const app = express();
 const PORT = process.env.PORT || 2001;
 
 const rootDir = path.resolve(__dirname);
-app.set('views', path.join(rootDir, 'views')); 
+app.set('Views', path.join(rootDir, 'Views')); 
 app.set('view engine', 'ejs');
 
 app.use(express.static('public'));
