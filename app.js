@@ -16,7 +16,7 @@ app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, 'views')); 
 app.set('view engine', 'ejs');
 app.use(morgan('dev'));
 
@@ -25,9 +25,7 @@ if (!process.env.MONGO_URI || !process.env.SESSION_SECRET) {
     process.exit(1);
 }
 
-mongoose.connect(process.env.MONGO_URI, {
-
-})
+mongoose.connect(process.env.MONGO_URI, {})
     .then(() => {
         console.log('MongoDB connected successfully!');
     })
@@ -51,11 +49,11 @@ app.use('/auth', authRoutes);
 app.use('/tasks', taskRoutes);
 
 app.get('/', (req, res) => {
-    res.render('index');
+    res.render('index'); 
 });
 
 app.get('/signup', (req, res) => {
-    res.render('signup');
+    res.render('signup'); 
 });
 
 app.listen(PORT, () => {
